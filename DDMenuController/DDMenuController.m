@@ -49,6 +49,9 @@
 @synthesize tap=_tap;
 @synthesize pan=_pan;
 
+- (bool) isIPad{
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+}
 
 - (id)initWithRootViewController:(UIViewController*)controller {
     if ((self = [self init])) {
@@ -75,7 +78,7 @@
     [super viewDidLoad];
     [self setRootViewController:_root]; // reset root
     
-    if (!_tap) {
+    if (!_tap && [self isIPad] == false) {
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
         tap.delegate = (id<UIGestureRecognizerDelegate>)self;
         [self.view addGestureRecognizer:tap];
@@ -332,7 +335,6 @@
 }
 
 - (void)tap:(UITapGestureRecognizer*)gesture {
-    
     [gesture setEnabled:NO];
     [self showRootController:YES];
     
@@ -504,7 +506,9 @@
         [UIView setAnimationsEnabled:NO];
     }
     
-    _root.view.userInteractionEnabled = NO;
+    if([self isIPad] == false){
+        _root.view.userInteractionEnabled = NO;
+    }
     [UIView animateWithDuration:.3 animations:^{
         _root.view.frame = frame;
     } completion:^(BOOL finished) {
@@ -735,8 +739,11 @@
 #pragma mark - Actions 
 
 - (void)showLeft:(id)sender {
-    
-    [self showLeftController:YES];
+    if(_menuFlags.showingLeftView && [self isIPad]){
+        [self showRootController:YES];
+    }else{
+        [self showLeftController:YES];
+    }
     
 }
 
